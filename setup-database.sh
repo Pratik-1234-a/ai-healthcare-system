@@ -78,3 +78,9 @@ echo "   http://localhost:3000 (Frontend)"
 echo "   http://localhost:5000/health (Backend)"
 echo ""
 echo "For detailed instructions, see: QUICKSTART_DATABASE.md"
+
+# Add voice_summary_url column to appointments table
+psql -U postgres -d healthcare_system -c "ALTER TABLE appointments ADD COLUMN voice_summary_url TEXT;"
+
+# Confirm the column was added
+echo "✅ voice_summary_url column added to appointments table!"

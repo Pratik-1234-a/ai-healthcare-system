@@ -85,12 +85,6 @@ function Navbar({ userRole, onLogout }) {
                 📅 Book Appointment
               </Link>
               <Link 
-                to="/patient/voice-recorder" 
-                className={`nav-link ${isActive('/patient/voice-recorder') ? 'active' : ''}`}
-              >
-                🎤 Record Symptoms
-              </Link>
-              <Link 
                 to="/patient/my-appointments" 
                 className={`nav-link ${isActive('/patient/my-appointments') ? 'active' : ''}`}
               >

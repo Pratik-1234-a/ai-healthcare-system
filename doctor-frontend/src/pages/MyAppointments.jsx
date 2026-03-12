@@ -94,6 +94,21 @@ function MyAppointments() {
                 <h3>Dr. {apt.doctorName}</h3>
                 <p className="specialization">🔬 {apt.doctorSpecialization}</p>
                 <p className="time">📅 {apt.appointmentDate} at {apt.appointmentTime}</p>
+                {apt.voiceSummary && (
+                  <span style={{
+                    display: 'inline-block',
+                    marginTop: '8px',
+                    background: 'rgba(6,182,212,0.15)',
+                    border: '1px solid rgba(6,182,212,0.3)',
+                    color: '#06b6d4',
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    fontSize: '12px',
+                    fontWeight: 600
+                  }}>
+                    🎤 Voice Summary Attached
+                  </span>
+                )}
               </div>
               <div className="appointment-status">
                 <span className={`status-badge ${apt.status.toLowerCase()}`}>

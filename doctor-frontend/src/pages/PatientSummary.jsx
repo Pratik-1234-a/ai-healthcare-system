@@ -21,13 +21,13 @@ function PatientSummary() {
     const apt = appointments.find(a => a.id === parseInt(id));
     setAppointment(apt);
 
-    // Get patient summary from voice recorder
-    const patientSummary = JSON.parse(localStorage.getItem('patientSummary'));
+    // Prefer per-appointment voiceSummary, fall back to global patientSummary
+    const patientSummary = apt?.voiceSummary || JSON.parse(localStorage.getItem('patientSummary'));
     if (patientSummary) {
       setSummary(patientSummary.summary);
       setSymptoms(patientSummary.symptoms || []);
       setRiskLevel(patientSummary.riskLevel || 'Medium');
-      
+
       // Generate recommendations based on symptoms
       generateRecommendations(patientSummary.symptoms);
     }

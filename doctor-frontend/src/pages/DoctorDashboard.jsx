@@ -14,8 +14,17 @@ function DoctorDashboard() {
   });
 
   useEffect(() => {
-    // TODO: Fetch appointments from API
-    setLoading(false);
+    // Fetch appointments from API
+    fetch('/api/appointments?doctor_id=123') // Replace with actual doctor_id
+      .then((response) => response.json())
+      .then((data) => {
+        setAppointments(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching appointments:', error);
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -101,11 +110,24 @@ function DoctorDashboard() {
         {/* Appointments Section */}
         <div className="appointments-list">
           <h2>Upcoming Appointments</h2>
-          {appointments.length === 0 ? (
+          {loading ? (
+            <p>Loading appointments...</p>
+          ) : appointments.length === 0 ? (
             <p className="empty-state">No appointments scheduled</p>
           ) : (
             appointments.map((apt) => (
-              <AppointmentCard key={apt.id} appointment={apt} />
+              <div key={apt.id} className="appointment-item">
+                <AppointmentCard appointment={apt} />
+                {apt.voice_summary_url && (
+                  <div className="voice-summary">
+                    <h4>Voice Summary:</h4>
+                    <audio controls>
+                      <source src={apt.voice_summary_url} type="audio/mpeg" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </div>
+                )}
+              </div>
             ))
           )}
         </div>

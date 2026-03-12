@@ -133,6 +133,24 @@ function DoctorAppointments() {
                 <p><strong>⏰ Time:</strong> {apt.appointmentTime}</p>
                 <p><strong>👨‍⚕️ Doctor:</strong> Dr. {apt.doctorName}</p>
                 <p><strong>🔬 Specialization:</strong> {apt.doctorSpecialization}</p>
+                {apt.voiceSummary && (
+                  <div style={{
+                    marginTop: '10px',
+                    padding: '10px 14px',
+                    background: 'rgba(6,182,212,0.1)',
+                    border: '1px solid rgba(6,182,212,0.25)',
+                    borderRadius: '10px'
+                  }}>
+                    <p style={{ color: '#06b6d4', fontWeight: 600, fontSize: '13px', margin: '0 0 6px' }}>
+                      🎤 Voice Symptom Summary
+                    </p>
+                    <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0, lineHeight: 1.5 }}>
+                      {apt.voiceSummary.summary.length > 120
+                        ? apt.voiceSummary.summary.substring(0, 120) + '...'
+                        : apt.voiceSummary.summary}
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="appointment-actions">
                 <button 

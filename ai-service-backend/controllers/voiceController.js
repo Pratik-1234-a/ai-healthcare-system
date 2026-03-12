@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const emailService = require('../services/emailService');
 
 // Create voice recording
 exports.createVoiceRecording = async (req, res) => {
@@ -28,6 +29,42 @@ exports.createVoiceRecording = async (req, res) => {
 
     if (error) {
       return res.status(500).json({ error: error.message });
+    }
+
+    // Update the appointment with the voice summary URL
+    if (appointment_id && audio_url) {
+      const { error: updateError } = await supabase
+        .from('appointments')
+        .update({ voice_summary_url: audio_url })
+        .eq('id', appointment_id);
+
+      if (updateError) {
+        console.error('Error updating appointment with voice summary:', updateError);
+        return res.status(500).json({ error: 'Failed to update appointment with voice summary' });
+      }
+    }
+
+    // Send the voice summary to the doctor
+    if (appointment_id) {
+      const { data: appointmentData, error: appointmentError } = await supabase
+        .from('appointments')
+        .select('doctor_email')
+        .eq('id', appointment_id)
+        .single();
+
+      if (appointmentError) {
+        console.error('Error fetching appointment details:', appointmentError);
+        return res.status(500).json({ error: 'Failed to fetch appointment details' });
+      }
+
+      const doctorEmail = appointmentData?.doctor_email;
+      if (doctorEmail) {
+        await emailService.sendEmail({
+          to: doctorEmail,
+          subject: 'New Voice Summary for Appointment',
+          text: `A new voice summary has been added for appointment ID: ${appointment_id}. You can access it here: ${audio_url}`,
+        });
+      }
     }
 
     return res.status(201).json({

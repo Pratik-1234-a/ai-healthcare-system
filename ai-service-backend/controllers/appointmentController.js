@@ -51,7 +51,11 @@ exports.getAllAppointments = async (req, res) => {
       return res.status(500).json({ error: error.message });
     }
 
-    return res.status(200).json(data);
+    // Ensure voice_summary_url is included
+    return res.status(200).json(data.map(appointment => ({
+      ...appointment,
+      voice_summary_url: appointment.voice_summary_url || null
+    })));
   } catch (error) {
     console.error('Error fetching appointments:', error);
     res.status(500).json({ error: 'Failed to fetch appointments' });
