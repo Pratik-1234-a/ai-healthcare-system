@@ -5,8 +5,12 @@ import AppointmentCard from '../components/AppointmentCard';
 function DoctorDashboard() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Use dynamically stored user name or fallback to default
+  const storedName = localStorage.getItem('userName') || 'Dr. John Smith';
+
   const [doctorInfo] = useState({
-    name: 'Dr. John Smith',
+    name: storedName,
     specialization: 'General Physician',
     licenseNumber: 'LIC-2023-001',
     yearsOfExperience: 8,

@@ -3,8 +3,12 @@ import { Link } from 'react-router-dom';
 
 function PatientDashboard() {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+  
+  // Use dynamically stored user name or fallback to default
+  const storedName = localStorage.getItem('userName') || 'John Doe';
+
   const [patientInfo] = useState({
-    name: 'John Doe',
+    name: storedName,
     age: 35,
     bloodType: 'O+',
     lastCheckup: '2024-02-15'
