@@ -12,6 +12,8 @@ function BookAppointment() {
   const [allDoctors, setAllDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [specialization, setSpecialization] = useState('');
+  const [specializations, setSpecializations] = useState([]);
+  const [loadingDoctors, setLoadingDoctors] = useState(true);
 
   // Step 2 state – Voice recorder
   const [isRecording, setIsRecording] = useState(false);
@@ -54,24 +56,38 @@ function BookAppointment() {
 
   // ─── Step 1: Doctor Selection ─────────────────────────────────────────
 
-  const loadDoctors = () => {
-    const approvedUsers = JSON.parse(localStorage.getItem('approvedUsers')) || [];
-    const approvedDoctors = approvedUsers.filter(user => user.type === 'doctor');
+  const loadDoctors = async () => {
+    setLoadingDoctors(true);
+    try {
+      // Fetch approved doctors from Supabase via backend API
+      const response = await fetch('http://localhost:5000/api/users/all?role=doctor&status=approved');
+      const data = await response.json();
 
-    const doctorsWithDetails = approvedDoctors.map((doctor, index) => ({
-      id: doctor.id,
-      name: doctor.fullName || doctor.name,
-      specialization: doctor.specialization,
-      email: doctor.email,
-      phone: doctor.phone,
-      license: doctor.license,
-      yearsOfExperience: Math.floor(Math.random() * 20) + 1,
-      rating: (Math.random() * 2 + 3).toFixed(1),
-      availableSlots: Math.floor(Math.random() * 8) + 2
-    }));
+      const doctorsFromDB = (Array.isArray(data) ? data : []).map((doctor) => ({
+        id: doctor.id,
+        name: doctor.name,
+        specialization: doctor.specialization || 'General Practice',
+        email: doctor.email,
+        phone: doctor.phone_number,
+        license: doctor.license_number,
+        yearsOfExperience: Math.floor(Math.random() * 20) + 1,
+        rating: (Math.random() * 2 + 3).toFixed(1),
+        availableSlots: Math.floor(Math.random() * 8) + 2
+      }));
 
-    setAllDoctors(doctorsWithDetails);
-    filterDoctorsBySpecialization(doctorsWithDetails, '');
+      // Build dynamic specialization list from actual doctors
+      const uniqueSpecs = [...new Set(doctorsFromDB.map(d => d.specialization).filter(Boolean))];
+      setSpecializations(uniqueSpecs.sort());
+
+      setAllDoctors(doctorsFromDB);
+      filterDoctorsBySpecialization(doctorsFromDB, '');
+    } catch (error) {
+      console.error('Error fetching doctors from database:', error);
+      setAllDoctors([]);
+      setDoctors([]);
+    } finally {
+      setLoadingDoctors(false);
+    }
   };
 
   const filterDoctors = () => {
@@ -537,21 +553,20 @@ function BookAppointment() {
             className="specialization-select"
           >
             <option value="">-- All Specializations --</option>
-            <option value="General Practice">General Practice</option>
-            <option value="Cardiology">Cardiology</option>
-            <option value="Neurology">Neurology</option>
-            <option value="Pediatrics">Pediatrics</option>
-            <option value="Orthopedics">Orthopedics</option>
-            <option value="Dermatology">Dermatology</option>
-            <option value="Psychiatry">Psychiatry</option>
-            <option value="Surgery">Surgery</option>
+            {specializations.map(spec => (
+              <option key={spec} value={spec}>{spec}</option>
+            ))}
           </select>
         </div>
       </div>
 
       <div className="doctors-list">
         <h2>Available Doctors {specialization && `(${specialization})`}</h2>
-        {doctors.length === 0 ? (
+        {loadingDoctors ? (
+          <div className="empty-state">
+            <p>⏳ Loading doctors from database...</p>
+          </div>
+        ) : doctors.length === 0 ? (
           <div className="empty-state">
             <p>No doctors available for this specialization yet.</p>
             <p>Please select a different specialization or check back later.</p>

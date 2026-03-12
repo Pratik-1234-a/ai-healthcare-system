@@ -4,12 +4,16 @@ const sendAppointmentConfirmation = async (req, res) => {
   try {
     const { patientEmail, appointmentDetails } = req.body;
 
-    await emailService.sendAppointmentConfirmation(patientEmail, appointmentDetails);
+    const result = await emailService.sendAppointmentConfirmation(patientEmail, appointmentDetails);
 
-    res.json({ message: 'Appointment confirmation email sent' });
+    res.json({
+      message: 'Appointment confirmation email sent',
+      previewUrl: result.previewUrl || null,
+      usingTestMode: result.usingEthereal || false
+    });
   } catch (error) {
     console.error('Error sending appointment confirmation:', error);
-    res.status(500).json({ error: 'Failed to send email' });
+    res.status(500).json({ error: 'Failed to send email: ' + error.message });
   }
 };
 
@@ -17,12 +21,22 @@ const sendPrescription = async (req, res) => {
   try {
     const { patientEmail, prescriptionData } = req.body;
 
-    await emailService.sendPrescription(patientEmail, prescriptionData);
+    if (!patientEmail) {
+      return res.status(400).json({ error: 'Patient email is required' });
+    }
 
-    res.json({ message: 'Prescription email sent' });
+    const result = await emailService.sendPrescription(patientEmail, prescriptionData);
+
+    res.json({
+      message: result.usingEthereal
+        ? 'Prescription email sent (test mode). Preview the email at the link below.'
+        : `Prescription email sent successfully to ${patientEmail}`,
+      previewUrl: result.previewUrl || null,
+      usingTestMode: result.usingEthereal || false
+    });
   } catch (error) {
     console.error('Error sending prescription:', error);
-    res.status(500).json({ error: 'Failed to send email' });
+    res.status(500).json({ error: 'Failed to send email: ' + error.message });
   }
 };
 
@@ -30,12 +44,16 @@ const sendAppointmentReminder = async (req, res) => {
   try {
     const { patientEmail, appointmentDetails } = req.body;
 
-    await emailService.sendAppointmentReminder(patientEmail, appointmentDetails);
+    const result = await emailService.sendAppointmentReminder(patientEmail, appointmentDetails);
 
-    res.json({ message: 'Appointment reminder email sent' });
+    res.json({
+      message: 'Appointment reminder email sent',
+      previewUrl: result.previewUrl || null,
+      usingTestMode: result.usingEthereal || false
+    });
   } catch (error) {
     console.error('Error sending reminder:', error);
-    res.status(500).json({ error: 'Failed to send email' });
+    res.status(500).json({ error: 'Failed to send email: ' + error.message });
   }
 };
 
