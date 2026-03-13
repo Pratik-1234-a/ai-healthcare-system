@@ -19,14 +19,21 @@ function DoctorDashboard() {
 
   useEffect(() => {
     // Fetch appointments from API
-    fetch('/api/appointments?doctor_id=123') // Replace with actual doctor_id
-      .then((response) => response.json())
+    const doctorId = localStorage.getItem('userId') || '123';
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    
+    fetch(`${API_URL}/appointments?doctor_id=${doctorId}`)
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+        return response.json();
+      })
       .then((data) => {
-        setAppointments(data);
+        setAppointments(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching appointments:', error);
+        setAppointments([]); // fallback to empty array on error
         setLoading(false);
       });
   }, []);
