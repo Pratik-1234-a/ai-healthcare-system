@@ -38,7 +38,8 @@ function DigitalWhiteboard() {
 
       // Also try fetching from database
       try {
-        const res = await fetch('http://localhost:5000/api/appointments');
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const res = await fetch(`${API_URL}/appointments`);
         const dbAppointments = await res.json();
         if (Array.isArray(dbAppointments) && dbAppointments.length > 0) {
           // Merge: prefer DB appointments, add local ones that aren't in DB
@@ -283,7 +284,8 @@ function DigitalWhiteboard() {
       const patientName = selectedAppointment.patientName || 'Patient';
 
       // Send via backend email API
-      const response = await fetch('http://localhost:5000/api/mail/send-prescription', {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_URL}/mail/send-prescription`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
