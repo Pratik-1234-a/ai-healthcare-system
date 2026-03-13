@@ -54,7 +54,7 @@ function BookAppointment() {
     };
   }, []);
 
-  // ─── Step 1: Doctor Selection ─────────────────────────────────────────
+  // ─── Step 1: Doctor Selection..... ─────────────────────────────────────────
 
   const loadDoctors = async () => {
     setLoadingDoctors(true);
